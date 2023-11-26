@@ -1,0 +1,148 @@
+version: '3'
+services:
+  zookeeper-1:
+    hostname: zookeeper1
+    image: confluentinc/cp-zookeeper:6.2.0
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_DATA_DIR: /zookeeper/data
+      ZOOKEEPER_SERVERS: zookeeper1:22888:23888;zookeeper2:32888:33888;zookeeper3:42888:43888
+    ports:
+      - 2181:2181
+      - 22888:22888
+      - 23888:23888
+    volumes:
+      - ./zookeeper/data/1:/zookeeper/data
+
+  zookeeper-2:
+    hostname: zookeeper2
+    image: confluentinc/cp-zookeeper:6.2.0
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: 22181
+      ZOOKEEPER_DATA_DIR: /zookeeper/data
+      ZOOKEEPER_SERVERS: zookeeper1:22888:23888;zookeeper2:32888:33888;zookeeper3:42888:43888
+    ports:
+      - 22181:22181
+      - 32888:32888
+      - 33888:33888
+    volumes:
+      - ./zookeeper/data/2:/zookeeper/data
+
+  zookeeper-3:
+    hostname: zookeeper3
+    image: confluentinc/cp-zookeeper:6.2.0
+    environment:
+      ZOOKEEPER_SERVER_ID: 3
+      ZOOKEEPER_CLIENT_PORT: 32181
+      ZOOKEEPER_DATA_DIR: /zookeeper/data
+      ZOOKEEPER_SERVERS: zookeeper1:22888:23888;zookeeper2:32888:33888;zookeeper3:42888:43888
+    ports:
+      - 32181:32181
+      - 42888:42888
+      - 43888:43888
+    volumes:
+      - ./zookeeper/data/3:/zookeeper/data
+
+  kafka-1:
+    image: confluentinc/cp-kafka:6.2.0
+    hostname: kafka1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper1:2181,zookeeper2:22181,zookeeper3:32181
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka1:19091,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9091
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
+      KAFKA_LOG_DIRS: /kafka
+    ports:
+      - 9091:9091
+    volumes:
+      - ./kafka/logs/1:/kafka
+
+  kafka-2:
+    image: confluentinc/cp-kafka:6.2.0
+    hostname: kafka2
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper1:2181,zookeeper2:22181,zookeeper3:32181
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka2:19092,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
+      KAFKA_LOG_DIRS: /kafka
+    ports:
+      - 9092:9092
+    volumes:
+      - ./kafka/logs/2:/kafka
+
+  kafka-3:
+    image: confluentinc/cp-kafka:6.2.0
+    hostname: kafka3
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper1:2181,zookeeper2:22181,zookeeper3:32181
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka3:19093,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
+      KAFKA_LOG_DIRS: /kafka
+    ports:
+      - 9093:9093
+    volumes:
+      - ./kafka/logs/3:/kafka
+
+  akhq:
+    image: tchiotludo/akhq:latest
+    hostname: akhq
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            kafka:
+              properties:
+                bootstrap.servers: kafka1:19091,kafka2:19092,kafka3:19093
+    ports:
+      - 8080:8080
+  myshop-redis: # 서비스명
+    container_name: myshop-redis       # 컨테이너 명
+    build:
+      dockerfile: Dockerfile
+      context: ./redis
+    image: aksla1122/myshop-redis
+    networks:
+      - myshop_network
+    ports:
+      - "6379:6379"
+  myshop-database:
+    container_name: myshop-database
+    build:
+      dockerfile: ./Dockerfile
+      context: ./database
+    image: aksla1122/myshop-database
+    networks:
+      - myshop_network
+    environment:
+      - MARIADB_DATABASE=myshop
+      - MARIADB_ROOT_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+    volumes:
+      - ./database/config:/etc/mysql/conf.d
+      - ./database/init:/docker-entrypoint-initdb.d
+    ports:
+      - "3307:3306"      # 접근 포트 설정 (컨테이너 외부:컨테이너 내부)
+networks:
+  myshop_network: { }

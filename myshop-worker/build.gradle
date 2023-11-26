@@ -1,0 +1,21 @@
+apply plugin: "java-library"
+
+description("myshop wokrer module")
+
+dependencies {
+    implementation project(':myshop-common')
+    implementation project(':myshop-core')
+    implementation project(':clients:notification')
+    implementation project(':clients:kafka')
+    implementation project(':clients:distributed-lock-aop')
+
+    implementation 'org.redisson:redisson-spring-boot-starter:3.16.3'
+
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.kafka:spring-kafka'
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
+    testImplementation(testFixtures(project(":myshop-core")))
+
+}

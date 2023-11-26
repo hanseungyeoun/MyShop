@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: myshop-admin
+  profiles:
+    active: local
+    include:
+      - db
+      - file
+      - logging
+      - authentication
+      - server-port
+      - static-resource
+    group:
+      local: db-local,logging-local, file-local,authentication-local,static-resource-local, port-local
+      test: db-test,logging-test, file-test,authentication-test, static-resource-local
+      prod: db-prod,logging-prod,file-prod,authentication-prod, port-prod, static-resource-server
+

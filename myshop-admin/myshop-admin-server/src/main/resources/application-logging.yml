@@ -1,0 +1,23 @@
+spring:
+  config:
+    activate:
+      on-profile: logging-local,logging-test
+
+logging:
+  level:
+    org.hibernate.orm.jdbc.bind: trace
+    com.querydsl: trace
+    com.example: trace
+    jakarta.persistence: trace
+
+---
+spring:
+  config:
+    activate:
+      on-profile: logging-prod
+
+logging:
+  level:
+    com.example: info
+    jakarta.persistence: info
+

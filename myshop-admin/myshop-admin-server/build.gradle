@@ -1,0 +1,25 @@
+description("myshop-admin-server module")
+
+dependencies {
+    //빌드 속도를 위해 잠시 막음
+    //implementation(project(":myshop-admin:myshop-admin-front"))
+    implementation project(':myshop-common')
+    implementation project(':myshop-core')
+    implementation project(path: ':clients:core-web')
+
+
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    runtimeOnly 'com.h2database:h2'
+
+
+
+    testImplementation(testFixtures(project(":myshop-core")))
+    testImplementation(testFixtures(project(":myshop-core")))
+}

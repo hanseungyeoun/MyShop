@@ -1,0 +1,21 @@
+#공통
+download-path: D:\2021\
+image-server-url: http://localhost:8092/images/
+
+---
+spring:
+  config:
+    activate:
+      on-profile: file-local,file-test
+
+download-path: D:\2021\
+image-server-url: http://localhost:8081/images/
+
+---
+spring:
+  config:
+    activate:
+      on-profile: file-prod
+
+download-path: D:\2021\
+image-server-url: http://localhost:8081/images/

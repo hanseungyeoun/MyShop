@@ -1,0 +1,16 @@
+spring:
+  config:
+    activate:
+      on-profile: authentication-local, authentication-test
+jwt:
+  accessTokenSecret: mysecretkeymysecretkeymysecretkey
+  accessTokenExpirationMsec: 2592000000
+
+---
+spring:
+  config:
+    activate:
+      on-profile: authentication-prod
+jwt:
+  accessTokenSecret: mysecretkeymysecretkeymysecretkey
+  accessTokenExpirationMsec: 2592000000

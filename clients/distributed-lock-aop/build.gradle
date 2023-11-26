@@ -1,0 +1,13 @@
+apply plugin: "java-library"
+description("distributed-lock-aop module")
+
+bootJar { enabled = false }
+jar { enabled = true }
+
+dependencies {
+    implementation project(':clients:redisson-client')
+
+    api 'org.redisson:redisson-spring-boot-starter:3.16.3'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework:spring-tx'
+}

@@ -1,0 +1,23 @@
+spring:
+  batch:
+    job:
+      name: ${job.name:NONE}
+    jdbc:
+      initialize-schema: always
+
+---
+spring:
+  application:
+    name: myshop-batch
+  profiles:
+    active: local
+    include:
+      - db
+      - logging
+      - server-port
+    group:
+      local: db-local,logging-local, port-local
+      test: db-test, logging-test
+      prod: db-prod,logging-prod, port-prod
+
+

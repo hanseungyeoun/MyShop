@@ -1,0 +1,14 @@
+spring:
+  config:
+    activate:
+      on-profile: port-local
+server:
+  port: 8091
+
+---
+spring:
+  config:
+    activate:
+      on-profile: port-prod
+server:
+  port: 8091

@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: myshop-api
+  profiles:
+    active: local
+    include:
+      - kafka
+      - db
+      - file
+      - logging
+      - authentication
+      - server-port
+      - redis
+    group:
+      local: db-local,logging-local, file-local, authentication-local, kafka-local, port-local, redis-local
+      test: db-test, logging-test, file-test, authentication-test, kafka-test, redis-test
+      prod: db-prod,logging-prod, file-prod,authentication-prod,kafka-prod,port-prod, redis-prod
+
+

@@ -1,0 +1,17 @@
+spring:
+  config:
+    activate:
+      on-profile: static-resource-local
+
+admin:
+  static-resource: local
+
+---
+spring:
+  config:
+    activate:
+      on-profile: static-resource-server
+
+admin:
+  static-resource: server
+

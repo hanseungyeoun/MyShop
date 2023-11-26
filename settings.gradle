@@ -1,0 +1,14 @@
+rootProject.name = 'MyShop'
+
+include(':clients:kafka')
+include(':clients:notification')
+include(':clients:core-web')
+include(':clients:redisson-client')
+include(':clients:distributed-lock-aop')
+include(':myshop-admin:myshop-admin-server')
+include(':myshop-admin:myshop-admin-front')
+include(':myshop-api')
+include(':myshop-batch')
+include(':myshop-core')
+include(':myshop-common')
+include(':myshop-worker')

@@ -1,0 +1,10 @@
+apply plugin: "java-library"
+
+description("redisson-client module")
+
+bootJar { enabled = false }
+jar { enabled = true }
+
+dependencies {
+    api 'org.redisson:redisson-spring-boot-starter:3.16.3'
+}

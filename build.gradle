@@ -1,0 +1,101 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.1.3' apply false
+    id 'io.spring.dependency-management' version '1.1.3'
+}
+
+allprojects { // 모든 프로젝트에 반영되는 부분
+    repositories {
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+}
+def javaProjects = [ // Java 로 작성된 소스코드에 대한 공통작업 선언
+                     project(':clients:kafka'),
+                     project(':clients:notification'),
+                     project(':clients:core-web'),
+                     project(':clients:redisson-client'),
+                     project(':clients:distributed-lock-aop'),
+                     project(':myshop-admin:myshop-admin-server'),
+                     project(':myshop-api'),
+                     project(':myshop-batch'),
+                     project(':myshop-core'),
+                     project(':myshop-common'),
+                     project(':myshop-worker'),
+]
+
+configure(javaProjects) {
+    apply plugin: "java"
+    apply plugin: "eclipse"
+    apply plugin: "idea"
+    apply plugin: "org.springframework.boot"
+    apply plugin: "io.spring.dependency-management"
+
+    group = "${projectGroup}"
+    version = "${projectVersion}-${new Date().format('yyyyMMddHHmmss')}"
+
+    sourceCompatibility = 17
+    targetCompatibility = 17
+
+    /**
+     * @see <a href="https://docs.gradle.org/current/userguide/platforms.html#sub:bom_import">Importing Maven BOMs</a>
+     * @see <a href="https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#Importing_Dependencies">Importing Dependencies</a>
+     */
+    dependencyManagement {
+        imports {
+            mavenBom("org.springframework.cloud:spring-cloud-dependencies:2021.0.3")
+            mavenBom("org.testcontainers:testcontainers-bom:1.17.3")
+        }
+    }
+
+    dependencies {
+        compileOnly("org.projectlombok:lombok")
+        annotationProcessor("org.projectlombok:lombok")
+
+        // mapstruct
+        implementation "org.mapstruct:mapstruct:1.5.2.Final"
+        annotationProcessor "org.mapstruct:mapstruct-processor:1.5.2.Final"
+        testAnnotationProcessor "org.mapstruct:mapstruct-processor:1.5.2.Final"
+        implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+        annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+        testImplementation("org.springframework.boot:spring-boot-starter-test")
+        implementation("org.springframework.boot:spring-boot-starter-logging")
+    }
+
+    /**
+     * @see <a href="https://docs.gradle.org/current/userguide/tutorial_using_tasks.html">Build Script Basics</a>
+     */
+    tasks.named('test') {
+        useJUnitPlatform {
+            excludeTags("integration")
+        }
+    }
+
+    tasks.register("integrationTest", Test) {
+        useJUnitPlatform {
+            includeTags("integration")
+        }
+    }
+
+    tasks.register("prepareKotlinBuildScriptModel") {}
+}
+
+def querydslProjects = [
+        project(":myshop-admin:myshop-admin-server"),
+        project(":myshop-api"),
+        project(":myshop-batch"),
+        project(":myshop-core"),
+        project(":myshop-worker"),
+]
+configure(querydslProjects) {
+    dependencies {
+        implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+        annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+        annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+        annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+    }
+}
+
+
+

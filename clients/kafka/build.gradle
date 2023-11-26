@@ -1,0 +1,14 @@
+apply plugin: "java-library"
+
+description("kafka module")
+
+bootJar { enabled = false }
+jar { enabled = true }
+
+dependencies {
+    implementation project(':myshop-common')
+
+    implementation 'org.springframework.kafka:spring-kafka'
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+}
